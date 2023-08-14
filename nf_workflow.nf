@@ -9,7 +9,7 @@ params.extractnaming = 'condensed' //condensed means it is mangled, original mea
 params.maxfilesize = "3000" // Default 3000 MB
 
 params.cache = "feather" // feather means it will cache, otherwise it will not
-params.cache_dir = "data/cache"
+params.massql_cache_directory = "data/cache"
 
 TOOL_FOLDER = "$baseDir/bin"
 params.publishdir = "nf_output"
@@ -41,7 +41,7 @@ process queryData {
         --output_file "${mangled_output_filename}_output.tsv" \
         --original_path "$filepath" \
         --cache $params.cache \
-        --cache_dir $params.cache_dir \
+        --cache_dir $params.massql_cache_directory \
         $extractflag \
         --maxfilesize $params.maxfilesize
     """
