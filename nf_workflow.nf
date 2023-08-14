@@ -3,7 +3,7 @@ nextflow.enable.dsl=2
 
 params.input_spectra = 'data/data' // We assume we pass it a folder with spectra files
 params.query = "QUERY scaninfo(MS2DATA)"
-params.parallel_files = 'NO'
+params.parallel_files = 'YES'
 params.extract = 'YES'
 params.extractnaming = 'condensed' //condensed means it is mangled, original means the original mzML filenames
 params.maxfilesize = "3000" // Default 3000 MB
@@ -40,6 +40,8 @@ process queryData {
         "${params.query}" \
         --output_file "${mangled_output_filename}_output.tsv" \
         --original_path "$filepath" \
+        --cache $params.cache \
+        --cache_dir $params.cache_dir \
         $extractflag \
         --maxfilesize $params.maxfilesize
     """
