@@ -14,6 +14,31 @@ params.cache_dir = "data/cache"
 TOOL_FOLDER = "$baseDir/bin"
 params.publishdir = "nf_output"
 
+// downloading all the files
+process prepInputFiles {
+    publishDir "$params.input_spectra", mode: 'copyNoFollow' // Warning, this is kind of a hack, it'll copy files back to the input folder
+    
+    conda "$TOOL_FOLDER/conda_env.yml"
+
+    input:
+    file input_parameters
+    file cache_directory
+
+    output:
+    val true
+    file "*.mzML" optional true
+    file "*.mzXML" optional true
+    file "*.mgf" optional true 
+
+    """
+    python $TOOL_FOLDER/scripts/download_public_data_usi.py \
+    $input_parameters \
+    . \
+    output_summary.tsv \
+    --cache_directory $cache_directory
+    """
+}
+
 // This is the parallel run that will run on the cluster
 process queryData {
     errorStrategy 'ignore'
