@@ -1,0 +1,1 @@
+../bin/MassQueryLanguage/tests/get_data.sh

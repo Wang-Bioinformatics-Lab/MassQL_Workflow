@@ -1,13 +1,15 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-params.input_spectra = 'data' // We assume we pass it a folder with spectra files
+params.input_spectra = 'data/data' // We assume we pass it a folder with spectra files
 params.query = "QUERY scaninfo(MS2DATA)"
 params.parallel_files = 'NO'
-params.parallel_query = 'NO' // Likely never to turn this on
 params.extract = 'YES'
 params.extractnaming = 'condensed' //condensed means it is mangled, original means the original mzML filenames
 params.maxfilesize = "3000" // Default 3000 MB
+
+params.cache = "feather"
+params.cache_dir = "data/cache"
 
 TOOL_FOLDER = "$baseDir/bin"
 params.publishdir = "nf_output"
@@ -37,13 +39,12 @@ process queryData {
         "$input_spectrum" \
         "${params.query}" \
         --output_file "${mangled_output_filename}_output.tsv" \
-        --parallel_query $params.parallel_query \
-        --cache NO \
         --original_path "$filepath" \
         $extractflag \
         --maxfilesize $params.maxfilesize
     """
 }
+
 process queryData2 {
     errorStrategy 'ignore'
     maxForks 1
@@ -66,8 +67,6 @@ process queryData2 {
         "$input_spectrum" \
         "${params.query}" \
         --output_file "${mangled_output_filename}_output.tsv" \
-        --parallel_query $params.parallel_query \
-        --cache NO \
         --original_path "$filepath" \
         $extractflag \
         --maxfilesize $params.maxfilesize
