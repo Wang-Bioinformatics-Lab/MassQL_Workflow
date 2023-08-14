@@ -8,7 +8,7 @@ params.extract = 'YES'
 params.extractnaming = 'condensed' //condensed means it is mangled, original means the original mzML filenames
 params.maxfilesize = "3000" // Default 3000 MB
 
-params.cache = "feather"
+params.cache = "feather" // feather means it will cache, otherwise it will not
 params.cache_dir = "data/cache"
 
 TOOL_FOLDER = "$baseDir/bin"
