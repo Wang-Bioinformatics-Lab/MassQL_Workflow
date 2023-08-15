@@ -70,6 +70,8 @@ process queryData2 {
         "${params.query}" \
         --output_file "${mangled_output_filename}_output.tsv" \
         --original_path "$filepath" \
+        --cache $params.cache \
+        --cache_dir $params.massql_cache_directory \
         $extractflag \
         --maxfilesize $params.maxfilesize
     """
