@@ -2,7 +2,7 @@ workflowname: massql_workflow
 workflowdescription: MassQL Nextflow Workflow
 workflowlongdescription: This is a MassQL Workflow
 workflowversion: "0.4"
-workflowfile: workflow.nf
+workflowfile: nf_workflow.nf
 workflowautohide: false
 adminonly: false
 #This maps the parameters from an input form to those that will appear in nextflow
