@@ -3,7 +3,7 @@ displayname: STUFF
 Views:
 -   name: Query Results
     displayname: Query Results
-    viewname: pairslist
+    viewname: queryresults
     displaytype: datatable_serverbig
     parameters:
         filename: nf_output/msql/merged_query_results.tsv
