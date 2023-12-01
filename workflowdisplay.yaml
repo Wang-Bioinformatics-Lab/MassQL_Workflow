@@ -24,7 +24,7 @@ Views:
                 data: query_index
         columnDefs: '[ {"targets": 0,"data": null,"render": function ( data, type, row, meta ) {
             return `
-            <a target="_blank" href="https://dashboard.gnps2.org/?usi=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}">View LCMS File</a>
+            <a target="_blank" href="https://dashboard.gnps2.org/?usi=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}&xic_rt_window=${encodeURIComponent(row["rt"])}&xic_mz=${encodeURIComponent(row["precmz"])}&ms2_identifier=MS2:${encodeURIComponent(row["scan"])}">View LCMS File</a>
             <br>
             <a target="_blank" href="https://metabolomics-usi.gnps2.org/dashinterface/?usi1=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}:scan:${encodeURIComponent(row["scan"])}">View Spectrum</a>
             `;}}]'
