@@ -10,8 +10,6 @@ Views:
         columns:
             -   title: "View"
                 data: 
-            -   title: "filename"
-                data: filename
             -   title: "original_path"
                 data: original_path
             -   title: "scan"
@@ -26,7 +24,9 @@ Views:
                 data: query_index
         columnDefs: '[ {"targets": 0,"data": null,"render": function ( data, type, row, meta ) {
             return `
-            <a target="_blank" href="/dashboards/lcms?usi=mzspec:GNPS2-${task}-${encodeURIComponent(row["filename"])}">None</a>
+            <a target="_blank" href="https://dashboard.gnps2.org/?usi=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}">View LCMS File</a>
+            <br>
+            <a target="_blank" href="https://metabolomics-usi.gnps2.org/dashinterface/?usi1=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}:scan:${encodeURIComponent(row["scan"])}">View Spectrum</a>
             `;}}]'
             
 # TODO: Show the extraction results
