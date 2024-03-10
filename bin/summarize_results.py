@@ -11,6 +11,7 @@ def main():
 
     results_df = pd.read_csv(args.input_results, sep='\t')
 
+
     print(results_df)
     with open(args.output_summary_html, 'a') as f:
         # Histogram of precursor m/z
@@ -33,6 +34,11 @@ def main():
             f.write(fig.to_html(full_html=False, include_plotlyjs='cdn'))
         except:
             pass
+
+    # Write out the summary
+    
+
+
 
 if __name__ == "__main__":
     main()

@@ -15,6 +15,25 @@ params.publishdir = "$baseDir"
 TOOL_FOLDER = "$baseDir/bin"
 
 
+process validateQuery {
+    publishDir "$params.publishdir/validation", mode: 'copy'
+
+    conda "$TOOL_FOLDER/conda_env.yml"
+
+    input:
+    val(query)
+
+    output:
+    file "validated_query.txt" optional true
+
+    script:
+    """
+    python $TOOL_FOLDER/validate_query.py \
+    "$query" \
+    validated_query.txt
+    """
+}
+
 // This is the parallel run that will run on the cluster
 process queryData {
     errorStrategy 'ignore'
@@ -208,6 +227,10 @@ process summarizeResults {
 
 
 workflow {
+    // Validate the query
+    validateQuery(params.query)
+
+
     _spectra_ch = Channel.empty()
     _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzML" ))
     _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzml" ))
