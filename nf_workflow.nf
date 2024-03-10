@@ -16,7 +16,7 @@ TOOL_FOLDER = "$baseDir/bin"
 
 
 process validateQuery {
-    publishDir "$params.publishdir/validation", mode: 'copy'
+    publishDir "$params.publishdir/nf_output/validation", mode: 'copy'
 
     conda "$TOOL_FOLDER/conda_env.yml"
 
@@ -72,7 +72,7 @@ process queryData2 {
     maxForks 1
     time '4h'
     
-    //publishDir "$params.publishdir/msql_temp", mode: 'copy'
+    //publishDir "$params.publishdir/nf_output/msql_temp", mode: 'copy'
     conda "$TOOL_FOLDER/conda_env.yml"
     
     input:
@@ -99,7 +99,7 @@ process queryData2 {
 
 // Merging the results, 100 results at a time, and then doing a full merge
 process formatResultsMergeRounds {
-    publishDir "$params.publishdir/msql", mode: 'copy'
+    publishDir "$params.publishdir/nf_output/msql", mode: 'copy'
     cache false
 
     //errorStrategy 'ignore'
@@ -124,7 +124,7 @@ process formatResultsMergeRounds {
 
 // Merging the JSON in rounds, 100 files at a time
 process formatExtractedSpectraRounds {
-    publishDir "$params.publishdir/extracted", mode: 'copy'
+    publishDir "$params.publishdir/nf_output/extracted", mode: 'copy'
     cache false
     errorStrategy 'ignore'
 
@@ -157,7 +157,7 @@ process formatExtractedSpectraRounds {
 
 // Extracting the spectra
 // process formatExtractedSpectra {
-//     publishDir "$params.publishdir/extracted", mode: 'copy'
+//     publishDir "$params.publishdir/nf_output/extracted", mode: 'copy'
 //     cache false
 //     errorStrategy 'ignore'
 
@@ -184,7 +184,7 @@ process formatExtractedSpectraRounds {
 // }
 
 // process summarizeExtracted {
-//     publishDir "$params.publishdir/summary", mode: 'copy'
+//     publishDir "$params.publishdir/nf_output/summary", mode: 'copy'
 //     cache false
 //     echo true
 //     errorStrategy 'ignore'
@@ -205,7 +205,7 @@ process formatExtractedSpectraRounds {
 
 
 process summarizeResults {
-    publishDir "$params.publishdir/summary", mode: 'copy'
+    publishDir "$params.publishdir/nf_output/summary", mode: 'copy'
     cache false
     errorStrategy 'ignore'
 
@@ -253,7 +253,7 @@ workflow {
 
     _merged_temp_summary_ch = formatResultsMergeRounds(_query_results_ch.collate( 100 ))
  
-    _query_results_merged_ch = _merged_temp_summary_ch.collectFile(name: "merged_query_results.tsv", storeDir: "$params.publishdir/msql", keepHeader: true)
+    _query_results_merged_ch = _merged_temp_summary_ch.collectFile(name: "merged_query_results.tsv", storeDir: "$params.publishdir/nf_output/msql", keepHeader: true)
 
 
     if(params.extract == "YES"){
