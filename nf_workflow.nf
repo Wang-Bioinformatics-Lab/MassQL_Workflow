@@ -11,8 +11,9 @@ params.maxfilesize = "3000" // Default 3000 MB
 params.cache = "feather" // feather means it will cache, otherwise it will not
 params.massql_cache_directory = "data/cache"
 
+params.publishdir = "$baseDir"
 TOOL_FOLDER = "$baseDir/bin"
-params.publishdir = "nf_output"
+
 
 // This is the parallel run that will run on the cluster
 process queryData {
