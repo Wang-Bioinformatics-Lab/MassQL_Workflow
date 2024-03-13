@@ -7,6 +7,7 @@ params.parallel_files = 'YES'
 params.extract = 'YES'
 params.extractnaming = 'condensed' //condensed means it is mangled, original means the original mzML filenames
 params.maxfilesize = "3000" // Default 3000 MB
+params.max_extracted_scans = "10000" // Default 10000 scans
 
 params.cache = "feather" // feather means it will cache, otherwise it will not
 params.massql_cache_directory = "data/cache"
@@ -131,7 +132,8 @@ process formatExtractedSpectraRounds {
     extracted_mgf \
     extracted_json \
     --output_tsv_prefix extracted_tsv/extracted_tsv \
-    --naming $params.extractnaming
+    --naming $params.extractnaming \
+    --max_extracted_scans $params.max_extracted_scans
     """
 }
 
