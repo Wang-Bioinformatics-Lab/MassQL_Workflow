@@ -7,9 +7,10 @@ params.parallel_files = 'YES'
 params.extract = 'YES'
 params.extractnaming = 'condensed' //condensed means it is mangled, original means the original mzML filenames
 params.maxfilesize = "3000" // Default 3000 MB
+params.max_extracted_scans = "10000" // Default 10000 scans
 
 params.cache = "feather" // feather means it will cache, otherwise it will not
-params.cache_dir = "data/cache" // These are feather caches
+params.massql_cache_directory = "data/cache" // These are feather caches
 
 // Workflow Boiler Plate
 params.OMETAPARAM_YAML = "job_parameters.yaml"
@@ -18,9 +19,28 @@ params.OMETAPARAM_YAML = "job_parameters.yaml"
 params.download_usi_filename = params.OMETAPARAM_YAML // This can be changed if you want to run locally
 params.cache_directory = "data/cache" // These are raw data caches
 
-
+params.publishdir = "$baseDir"
 TOOL_FOLDER = "$baseDir/bin"
-params.publishdir = "nf_output"
+
+
+process validateQuery {
+    publishDir "$params.publishdir/nf_output/validation", mode: 'copy'
+
+    conda "$TOOL_FOLDER/conda_env.yml"
+
+    input:
+    val(query)
+
+    output:
+    file "validated_query.txt" optional true
+
+    script:
+    """
+    python $TOOL_FOLDER/validate_query.py \
+    "$query" \
+    validated_query.txt
+    """
+}
 
 // downloading all the files
 process prepInputFiles {
@@ -74,7 +94,7 @@ process queryData {
         --output_file "${mangled_output_filename}_output.tsv" \
         --original_path "$filepath" \
         --cache $params.cache \
-        --cache_dir $params.cache_dir \
+        --cache_dir $params.massql_cache_directory \
         $extractflag \
         --maxfilesize $params.maxfilesize
     """
@@ -85,7 +105,7 @@ process queryData2 {
     maxForks 1
     time '4h'
     
-    //publishDir "$params.publishdir/msql_temp", mode: 'copy'
+    //publishDir "$params.publishdir/nf_output/msql_temp", mode: 'copy'
     conda "$TOOL_FOLDER/conda_env.yml"
     
     input:
@@ -103,6 +123,8 @@ process queryData2 {
         "${params.query}" \
         --output_file "${mangled_output_filename}_output.tsv" \
         --original_path "$filepath" \
+        --cache $params.cache \
+        --cache_dir $params.massql_cache_directory \
         $extractflag \
         --maxfilesize $params.maxfilesize
     """
@@ -110,7 +132,7 @@ process queryData2 {
 
 // Merging the results, 100 results at a time, and then doing a full merge
 process formatResultsMergeRounds {
-    publishDir "$params.publishdir/msql", mode: 'copy'
+    publishDir "$params.publishdir/nf_output/msql", mode: 'copy'
     cache false
 
     //errorStrategy 'ignore'
@@ -135,7 +157,7 @@ process formatResultsMergeRounds {
 
 // Merging the JSON in rounds, 100 files at a time
 process formatExtractedSpectraRounds {
-    publishDir "$params.publishdir/extracted", mode: 'copy'
+    publishDir "$params.publishdir/nf_output/extracted", mode: 'copy'
     cache false
     errorStrategy 'ignore'
 
@@ -161,14 +183,15 @@ process formatExtractedSpectraRounds {
     extracted_mgf \
     extracted_json \
     --output_tsv_prefix extracted_tsv/extracted_tsv \
-    --naming $params.extractnaming
+    --naming $params.extractnaming \
+    --max_extracted_scans $params.max_extracted_scans
     """
 }
 
 
 // Extracting the spectra
 // process formatExtractedSpectra {
-//     publishDir "$params.publishdir/extracted", mode: 'copy'
+//     publishDir "$params.publishdir/nf_output/extracted", mode: 'copy'
 //     cache false
 //     errorStrategy 'ignore'
 
@@ -195,7 +218,7 @@ process formatExtractedSpectraRounds {
 // }
 
 // process summarizeExtracted {
-//     publishDir "$params.publishdir/summary", mode: 'copy'
+//     publishDir "$params.publishdir/nf_output/summary", mode: 'copy'
 //     cache false
 //     echo true
 //     errorStrategy 'ignore'
@@ -216,7 +239,7 @@ process formatExtractedSpectraRounds {
 
 
 process summarizeResults {
-    publishDir "$params.publishdir/summary", mode: 'copy'
+    publishDir "$params.publishdir/nf_output/summary", mode: 'copy'
     cache false
     errorStrategy 'ignore'
 
@@ -238,6 +261,10 @@ process summarizeResults {
 
 
 workflow {
+
+    // Validate the query
+    validateQuery(params.query)
+
     // Downloading all files via USI
     input_spectra_ch = Channel.fromPath(params.input_spectra)
     usi_download_ch = Channel.fromPath(params.download_usi_filename)
@@ -264,7 +291,7 @@ workflow {
 
     _merged_temp_summary_ch = formatResultsMergeRounds(_query_results_ch.collate( 100 ))
  
-    _query_results_merged_ch = _merged_temp_summary_ch.collectFile(name: "merged_query_results.tsv", storeDir: "$params.publishdir/msql", keepHeader: true)
+    _query_results_merged_ch = _merged_temp_summary_ch.collectFile(name: "merged_query_results.tsv", storeDir: "$params.publishdir/nf_output/msql", keepHeader: true)
 
 
     if(params.extract == "YES"){

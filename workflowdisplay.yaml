@@ -3,15 +3,13 @@ displayname: STUFF
 Views:
 -   name: Query Results
     displayname: Query Results
-    viewname: pairslist
+    viewname: queryresults
     displaytype: datatable_serverbig
     parameters:
         filename: nf_output/msql/merged_query_results.tsv
         columns:
             -   title: "View"
                 data: 
-            -   title: "filename"
-                data: filename
             -   title: "original_path"
                 data: original_path
             -   title: "scan"
@@ -26,7 +24,9 @@ Views:
                 data: query_index
         columnDefs: '[ {"targets": 0,"data": null,"render": function ( data, type, row, meta ) {
             return `
-            <a target="_blank" href="/dashboards/lcms?usi=mzspec:GNPS2-${task}-${encodeURIComponent(row["filename"])}">None</a>
+            <a target="_blank" href="https://dashboard.gnps2.org/?usi=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}&xic_rt_window=${encodeURIComponent(row["rt"])}&xic_mz=${encodeURIComponent(row["precmz"])}&ms2_identifier=MS2:${encodeURIComponent(row["scan"])}">View LCMS File</a>
+            <br>
+            <a target="_blank" href="https://metabolomics-usi.gnps2.org/dashinterface/?usi1=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}:scan:${encodeURIComponent(row["scan"])}">View Spectrum</a>
             `;}}]'
             
 # TODO: Show the extraction results
