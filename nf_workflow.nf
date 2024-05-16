@@ -183,8 +183,7 @@ process formatExtractedSpectraRounds {
     extracted_mgf \
     extracted_json \
     --output_tsv_prefix extracted_tsv/extracted_tsv \
-    --naming $params.extractnaming \
-    --max_extracted_scans $params.max_extracted_scans
+    --naming $params.extractnaming
     """
 }
 

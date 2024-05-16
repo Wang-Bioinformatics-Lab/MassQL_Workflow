@@ -82,7 +82,7 @@ parameterlist:
         - value: "NO"
           display: "No"
 
-    - displayname: Max Extraction Scans
+    - displayname: Max Extraction Scans (per file, current not implemented)
       paramtype: select
       nf_paramname: max_extracted_scans
       formvalue: "10000"

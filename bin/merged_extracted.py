@@ -42,7 +42,7 @@ def main():
     parser.add_argument('output_mzML_folder', help='Output mzML Folder')
     parser.add_argument('output_mgf_folder', help='Output mgf Folder')
     parser.add_argument('output_json_folder', help='Output merged JSON Folder')
-    #parser.add_argument('output_parquet', help='Output Parquet File')
+    
     parser.add_argument('--output_tsv', default=None, help='Output Summary Extraction File')
     parser.add_argument('--output_tsv_prefix', default=None, help='Output Summary Extraction output_tsv_prefix')
     parser.add_argument('--naming', default="condensed", help='Can be condensed or original')
