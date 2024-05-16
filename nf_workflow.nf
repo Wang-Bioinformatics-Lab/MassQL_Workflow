@@ -270,16 +270,8 @@ workflow {
     usi_download_ch = Channel.fromPath(params.download_usi_filename)
     (_, _spectra_ch) = prepInputFiles(usi_download_ch, Channel.fromPath(params.cache_directory), input_spectra_ch)
     _spectra_ch = _spectra_ch.flatten()
-
-    // _spectra_ch = Channel.empty()
-    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzML" ))
-    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzml" ))
-    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzXML" ))
-    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzxml" ))
-    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.MGF" ))
-    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mgf" ))
-    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.json" ))
     
+    // Mapping the original filenames so we can display and have provenance
     _spectra_ch2 = _spectra_ch.map { file -> tuple(file, file.toString().replaceAll("/", "_").replaceAll(" ", "_"), file) }
 
     if(params.parallel_files == "YES"){
