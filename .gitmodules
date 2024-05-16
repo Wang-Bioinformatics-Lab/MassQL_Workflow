@@ -4,3 +4,6 @@
 [submodule "bin/MassQueryLanguage"]
 	path = bin/MassQueryLanguage
 	url = https://github.com/mwang87/MassQueryLanguage.git
+[submodule "bin/downloadpublicdata"]
+	path = bin/downloadpublicdata
+	url = https://github.com/Wang-Bioinformatics-Lab/downloadpublicdata.git

@@ -10,7 +10,14 @@ params.maxfilesize = "3000" // Default 3000 MB
 params.max_extracted_scans = "10000" // Default 10000 scans
 
 params.cache = "feather" // feather means it will cache, otherwise it will not
-params.massql_cache_directory = "data/cache"
+params.massql_cache_directory = "data/cache" // These are feather caches
+
+// Workflow Boiler Plate
+params.OMETAPARAM_YAML = "job_parameters.yaml"
+
+// Downloading Files
+params.download_usi_filename = params.OMETAPARAM_YAML // This can be changed if you want to run locally
+params.cache_directory = "data/cache" // These are raw data caches
 
 params.publishdir = "$baseDir"
 TOOL_FOLDER = "$baseDir/bin"
@@ -32,6 +39,31 @@ process validateQuery {
     python $TOOL_FOLDER/validate_query.py \
     "$query" \
     validated_query.txt
+    """
+}
+
+// downloading all the files
+process prepInputFiles {
+    //publishDir "$params.input_spectra", mode: 'copyNoFollow' // Warning, this is kind of a hack, it'll copy files back to the input folder
+    
+    conda "$TOOL_FOLDER/conda_env.yml"
+
+    input:
+    file input_parameters
+    file cache_directory
+    file input_spectra_folder
+
+    output:
+    val true
+    // Here we likely need to output the individual files from the input spectra folder to get to the next
+    file "${input_spectra_folder}/**"
+
+    """
+    python $TOOL_FOLDER/download_public_data_usi.py \
+    $input_parameters \
+    $input_spectra_folder \
+    output_summary.tsv \
+    --cache_directory $cache_directory
     """
 }
 
@@ -229,28 +261,32 @@ process summarizeResults {
 
 
 workflow {
+
     // Validate the query
     validateQuery(params.query)
 
+    // Downloading all files via USI
+    input_spectra_ch = Channel.fromPath(params.input_spectra)
+    usi_download_ch = Channel.fromPath(params.download_usi_filename)
+    (_, _spectra_ch) = prepInputFiles(usi_download_ch, Channel.fromPath(params.cache_directory), input_spectra_ch)
+    _spectra_ch = _spectra_ch.flatten()
 
-    _spectra_ch = Channel.empty()
-    _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzML" ))
-    _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzml" ))
-    _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzXML" ))
-    _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzxml" ))
-    _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.MGF" ))
-    _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mgf" ))
-    _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.json" ))
+    // _spectra_ch = Channel.empty()
+    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzML" ))
+    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzml" ))
+    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzXML" ))
+    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mzxml" ))
+    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.MGF" ))
+    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mgf" ))
+    // _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.json" ))
     
-    //_spectra_ch = Channel.fromPath( params.input_spectra ) // This is the old code when we pass it a path to a glob of files
-    
-    _spectra_ch3 = _spectra_ch.map { file -> tuple(file, file.toString().replaceAll("/", "_").replaceAll(" ", "_"), file) }
+    _spectra_ch2 = _spectra_ch.map { file -> tuple(file, file.toString().replaceAll("/", "_").replaceAll(" ", "_"), file) }
 
     if(params.parallel_files == "YES"){
-        (_query_results_ch, _query_extract_results_ch) = queryData(_spectra_ch3)
+        (_query_results_ch, _query_extract_results_ch) = queryData(_spectra_ch2)
     }
     else{
-        (_query_results_ch, _query_extract_results_ch) = queryData2(_spectra_ch3)
+        (_query_results_ch, _query_extract_results_ch) = queryData2(_spectra_ch2)
     }
 
     _merged_temp_summary_ch = formatResultsMergeRounds(_query_results_ch.collate( 100 ))
