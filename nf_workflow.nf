@@ -289,7 +289,7 @@ workflow {
         (_, _, _, _extracted_summary_ch) = formatExtractedSpectraRounds(_query_extract_results_ch.collate( 100 ))
 
         // Once we've done this, then we'lll do the actual merge
-        _extracted_summary_ch.collectFile(name: "extracted.tsv", storeDir: "$params.publishdir/extracted", keepHeader: true)
+        _extracted_summary_ch.collectFile(name: "extracted.tsv", storeDir: "$params.publishdir/nf_output/extracted", keepHeader: true)
     }
 
     summarizeResults(_query_results_merged_ch)
