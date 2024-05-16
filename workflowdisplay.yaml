@@ -52,7 +52,7 @@ Views:
                 data: query_index
         columnDefs: '[ {"targets": 0,"data": null,"render": function ( data, type, row, meta ) {
             return `
-            <a target="_blank" href="https://metabolomics-usi.gnps2.org/dashinterface/?usi1=mzspec:GNPS2:TASK-${task}-nf_output/extracted/mzML/${encodeURIComponent(row["new_filename"])}:scan:${encodeURIComponent(row["new_scan"])}">View Spectrum</a>
+            <a target="_blank" href="https://metabolomics-usi.gnps2.org/dashinterface/?usi1=mzspec:GNPS2:TASK-${task}-nf_output/extracted/extracted_mzML/${encodeURIComponent(row["new_filename"])}:scan:${encodeURIComponent(row["new_scan"])}">View Spectrum</a>
             `;}}]'
 
 # New section
