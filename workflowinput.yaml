@@ -30,6 +30,9 @@ parameterlist:
       cols: 50
 
     - displayname: MassQL Query
+      paramtype: section
+
+    - displayname: MassQL Query
       paramtype: textarea
       nf_paramname: query
       formplaceholder: Enter MassQL Query
