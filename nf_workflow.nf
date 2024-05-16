@@ -9,31 +9,39 @@ params.extractnaming = 'condensed' //condensed means it is mangled, original mea
 params.maxfilesize = "3000" // Default 3000 MB
 
 params.cache = "feather" // feather means it will cache, otherwise it will not
-params.cache_dir = "data/cache"
+params.cache_dir = "data/cache" // These are feather caches
+
+// Workflow Boiler Plate
+params.OMETAPARAM_YAML = "job_parameters.yaml"
+
+// Downloading Files
+params.download_usi_filename = params.OMETAPARAM_YAML // This can be changed if you want to run locally
+params.cache_directory = "data/cache" // These are raw data caches
+
 
 TOOL_FOLDER = "$baseDir/bin"
 params.publishdir = "nf_output"
 
+
+
 // downloading all the files
 process prepInputFiles {
-    publishDir "$params.input_spectra", mode: 'copyNoFollow' // Warning, this is kind of a hack, it'll copy files back to the input folder
+    //publishDir "$params.input_spectra", mode: 'copyNoFollow' // Warning, this is kind of a hack, it'll copy files back to the input folder
     
     conda "$TOOL_FOLDER/conda_env.yml"
 
     input:
     file input_parameters
     file cache_directory
+    file input_spectra_folder
 
     output:
     val true
-    file "*.mzML" optional true
-    file "*.mzXML" optional true
-    file "*.mgf" optional true 
 
     """
     python $TOOL_FOLDER/scripts/download_public_data_usi.py \
     $input_parameters \
-    . \
+    $input_spectra_folder \
     output_summary.tsv \
     --cache_directory $cache_directory
     """
@@ -239,7 +247,7 @@ workflow {
     _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.mgf" ))
     _spectra_ch = _spectra_ch.concat(Channel.fromPath( params.input_spectra + "/**.json" ))
     
-    //_spectra_ch = Channel.fromPath( params.input_spectra ) // This is the old code when we pass it a path to a glob of files
+    prepInputFiles(usi_download_ch, Channel.fromPath(params.cache_directory), input_spectra_ch)
     
     _spectra_ch3 = _spectra_ch.map { file -> tuple(file, file.toString().replaceAll("/", "_").replaceAll(" ", "_"), file) }
 
