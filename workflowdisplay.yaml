@@ -29,8 +29,37 @@ Views:
             <a target="_blank" href="https://metabolomics-usi.gnps2.org/dashinterface/?usi1=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}:scan:${encodeURIComponent(row["scan"])}">View Spectrum</a>
             `;}}]'
             
-# TODO: Show the extraction results
+-   name: Extraction Results
+    displayname: Extraction Results
+    viewname: extractionresults
+    displaytype: datatable_serverbig
+    parameters:
+        filename: nf_output/extracted/extracted.tsv
+        columns:
+            -   title: "View"
+                data: 
+            -   title: "new_filename"
+                data: new_filename
+            -   title: "new_scan"
+                data: new_scan
+            -   title: "rt"
+                data: rt
+            -   title: "precmz"
+                data: precmz
+            -   title: "mslevel"
+                data: mslevel
+            -   title: "query_index"
+                data: query_index
+        columnDefs: '[ {"targets": 0,"data": null,"render": function ( data, type, row, meta ) {
+            return `
+            <a target="_blank" href="https://metabolomics-usi.gnps2.org/dashinterface/?usi1=mzspec:GNPS2:TASK-${task}-nf_output/extracted/mzML/${encodeURIComponent(row["new_filename"])}:scan:${encodeURIComponent(row["new_scan"])}">View Spectrum</a>
+            `;}}]'
 
+# New section
+-   name: section
+    displayname: Downstream Analysis
+    viewname: section
+    displaytype: section
 
 # Linking out to do molecular networking
 -   name: Downstream Analysis - Run Molecular Networking
