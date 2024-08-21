@@ -59,11 +59,12 @@ process prepInputFiles {
     file "${input_spectra_folder}/**"
 
     """
-    python $TOOL_FOLDER/download_public_data_usi.py \
+    python $TOOL_FOLDER/downloadpublicdata/bin/download_public_data_usi.py \
     $input_parameters \
     $input_spectra_folder \
     output_summary.tsv \
-    --cache_directory $cache_directory
+    --cache_directory $cache_directory \
+    --existing_dataset_directory /data/datasets/server
     """
 }
 
