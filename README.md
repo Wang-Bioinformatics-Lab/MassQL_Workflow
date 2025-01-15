@@ -12,7 +12,37 @@ https://www.nextflow.io/docs/latest/index.html
 
 ## Installation
 
-You will need to have conda, mamba, and nextflow installed to run things locally. 
+You will need to have mamba, and nextflow installed to run things locally. 
+
+Broadly recommend installing mamba from mamba installed and then using mamba to install nextflow
+
+## Running Local Test
+
+Getting test data
+
+```
+cd data
+sh ./get_data.sh
+```
+
+Running the test case
+
+```
+make run_test
+```
+
+or more explicitly so you can see what you can edit
+
+```
+nextflow run nf_workflow.nf -resume \
+	-c nextflow_test.config \
+	--parallel_files "YES" \
+	--extract "NO" \
+	--maxfilesize 100 \
+	--cache_dir "${PWD}/data/cache" \
+	--input_spectra "${PWD}/data/data" \
+	--query "QUERY scaninfo(MS2DATA)"
+```
 
 ## Deployment to GNPS2
 
