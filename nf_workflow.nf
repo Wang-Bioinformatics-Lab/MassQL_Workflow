@@ -19,12 +19,24 @@ params.OMETAPARAM_YAML = "job_parameters.yaml"
 params.download_usi_filename = params.OMETAPARAM_YAML // This can be changed if you want to run locally
 params.cache_directory = "data/cache" // These are raw data caches
 
-params.publishdir = "$baseDir"
+params.publishdir = "$launchDir"
 TOOL_FOLDER = "$baseDir/bin"
 
+// COMPATIBILITY NOTE: The following might be necessary if this workflow is being deployed in a slightly different environemnt
+// checking if outdir is defined,
+// if so, then set publishdir to outdir
+if (params.outdir) {
+    _publishdir = params.outdir
+}
+else{
+    _publishdir = params.publishdir
+}
+
+// Augmenting with nf_output
+_publishdir = "${_publishdir}/nf_output"
 
 process validateQuery {
-    publishDir "$params.publishdir/nf_output/validation", mode: 'copy'
+    publishDir "$_publishdir/validation", mode: 'copy'
 
     conda "$TOOL_FOLDER/conda_env.yml"
 
@@ -133,7 +145,7 @@ process queryData2 {
 
 // Merging the results, 100 results at a time, and then doing a full merge
 process formatResultsMergeRounds {
-    publishDir "$params.publishdir/nf_output/msql", mode: 'copy'
+    publishDir "$_publishdir/msql", mode: 'copy'
     cache false
 
     //errorStrategy 'ignore'
@@ -158,7 +170,7 @@ process formatResultsMergeRounds {
 
 // Merging the JSON in rounds, 100 files at a time
 process formatExtractedSpectraRounds {
-    publishDir "$params.publishdir/nf_output/extracted", mode: 'copy'
+    publishDir "$_publishdir/extracted", mode: 'copy'
     cache false
     errorStrategy 'ignore'
 
@@ -239,7 +251,7 @@ process formatExtractedSpectraRounds {
 
 
 process summarizeResults {
-    publishDir "$params.publishdir/nf_output/summary", mode: 'copy'
+    publishDir "$_publishdir/summary", mode: 'copy'
     cache false
     errorStrategy 'ignore'
 
@@ -283,14 +295,14 @@ workflow {
 
     _merged_temp_summary_ch = formatResultsMergeRounds(_query_results_ch.collate( 100 ))
  
-    _query_results_merged_ch = _merged_temp_summary_ch.collectFile(name: "merged_query_results.tsv", storeDir: "$params.publishdir/nf_output/msql", keepHeader: true)
+    _query_results_merged_ch = _merged_temp_summary_ch.collectFile(name: "merged_query_results.tsv", storeDir: "$_publishdir/msql", keepHeader: true)
 
 
     if(params.extract == "YES"){
         (_, _, _, _extracted_summary_ch) = formatExtractedSpectraRounds(_query_extract_results_ch.collate( 100 ))
 
         // Once we've done this, then we'lll do the actual merge
-        _extracted_summary_ch.collectFile(name: "extracted.tsv", storeDir: "$params.publishdir/nf_output/extracted", keepHeader: true)
+        _extracted_summary_ch.collectFile(name: "extracted.tsv", storeDir: "$_publishdir/extracted", keepHeader: true)
     }
 
     summarizeResults(_query_results_merged_ch)

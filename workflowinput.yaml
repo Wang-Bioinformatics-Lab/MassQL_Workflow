@@ -2,7 +2,7 @@ workflowname: massql_workflow
 workflowdescription: MassQL Nextflow Workflow
 workflowlongdescription: This is a MassQL Workflow
 workflowversion: "0.5"
-workflowversion: "2024.08.21"
+workflowversion: "2025.08.15"
 workflowfile: nf_workflow.nf
 workflowautohide: false
 adminonly: false
