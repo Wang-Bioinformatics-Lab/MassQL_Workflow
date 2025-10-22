@@ -20,13 +20,29 @@ Views:
                 data: precmz
             -   title: "mslevel"
                 data: mslevel
+            -   title: "rt"
+                data: "rt"
+            -   title: "X value"
+                data: "comment"
             -   title: "query_index"
                 data: query_index
         columnDefs: '[ {"targets": 0,"data": null,"render": function ( data, type, row, meta ) {
+            let massqlLink;
+            const ms2Link = `<a target="_blank" href="https://massql.gnps2.org/?ms2_usi=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}:scan:${encodeURIComponent(row["scan"])}">View MassQL Visualization</a>`;
+            const ms1Link = `<a target="_blank" href="https://massql.gnps2.org/?ms1_usi=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}:scan:${encodeURIComponent(row["scan"])}">View MassQL Visualization (MS1)</a>`;
+
+            if (row["mslevel"] === 2) {
+                massqlLink = ms2Link;
+            } else {
+                massqlLink = ms1Link;
+            }
+            
             return `
-            <a target="_blank" href="https://dashboard.gnps2.org/?usi=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}&xic_rt_window=${encodeURIComponent(row["rt"])}&xic_mz=${encodeURIComponent(row["precmz"])}&ms2_identifier=MS2:${encodeURIComponent(row["scan"])}">View LCMS File</a>
-            <br>
-            <a target="_blank" href="https://metabolomics-usi.gnps2.org/dashinterface/?usi1=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}:scan:${encodeURIComponent(row["scan"])}">View Spectrum</a>
+                <a target="_blank" href="https://dashboard.gnps2.org/?usi=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}&xic_rt_window=${encodeURIComponent(row["rt"])}&xic_mz=${encodeURIComponent(row["precmz"])}&ms2_identifier=MS2:${encodeURIComponent(row["scan"])}">View LCMS File</a>
+                <br>
+                <a target="_blank" href="https://metabolomics-usi.gnps2.org/dashinterface/?usi1=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}:scan:${encodeURIComponent(row["scan"])}">View Spectrum</a>
+                <br>
+                ${massqlLink}
             `;}}]'
             
 -   name: Extraction Results
