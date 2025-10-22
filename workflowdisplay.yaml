@@ -22,19 +22,16 @@ Views:
                 data: mslevel
             -   title: "rt"
                 data: "rt"
-            -   title: "X value"
+            -   title: "X Val"
                 data: "comment"
             -   title: "query_index"
                 data: query_index
         columnDefs: '[ {"targets": 0,"data": null,"render": function ( data, type, row, meta ) {
             let massqlLink;
-            const ms2Link = `<a target="_blank" href="https://massql.gnps2.org/?ms2_usi=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}:scan:${encodeURIComponent(row["scan"])}">View MassQL Visualization</a>`;
-            const ms1Link = `<a target="_blank" href="https://massql.gnps2.org/?ms1_usi=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}:scan:${encodeURIComponent(row["scan"])}">View MassQL Visualization (MS1)</a>`;
-
             if (row["mslevel"] === 2) {
-                massqlLink = ms2Link;
+                massqlLink = `<a target="_blank" href="https://massql.gnps2.org/?ms2_usi=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}:scan:${encodeURIComponent(row["scan"])}&x_value=${encodeURIComponent(row["comment"])}">View MassQL Visualization</a>`;
             } else {
-                massqlLink = ms1Link;
+                massqlLink = `<a target="_blank" href="https://massql.gnps2.org/?ms1_usi=mzspec:GNPS2:TASK-${task}-${encodeURIComponent(row["original_path"])}:scan:${encodeURIComponent(row["scan"])}&x_value=${encodeURIComponent(row["comment"])}">View MassQL Visualization (MS1)</a>`;
             }
             
             return `
