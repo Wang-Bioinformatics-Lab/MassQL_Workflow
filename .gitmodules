@@ -7,3 +7,6 @@
 [submodule "bin/downloadpublicdata"]
 	path = bin/downloadpublicdata
 	url = https://github.com/Wang-Bioinformatics-Lab/downloadpublicdata.git
+[submodule "MassQueryLanguage_Rust"]
+	path = MassQueryLanguage_Rust
+	url = https://github.com/Wang-Bioinformatics-Lab/MassQueryLanguage_Rust.git
