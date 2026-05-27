@@ -4,6 +4,7 @@ nextflow.enable.dsl=2
 params.input_spectra = 'data/data' // We assume we pass it a folder with spectra files
 params.query = "QUERY scaninfo(MS2DATA)"
 params.parallel_files = 'YES'
+params.massql_engine = 'reference' // 'reference' = Python msql_cmd.py (full support); 'fast' = Rust massql binary (~100x, core queries)
 params.extract = 'YES'
 params.extractnaming = 'condensed' //condensed means it is mangled, original means the original mzML filenames
 params.maxfilesize = "3000" // Default 3000 MB
@@ -50,7 +51,8 @@ process validateQuery {
     """
     python $TOOL_FOLDER/validate_query.py \
     "$query" \
-    validated_query.txt
+    validated_query.txt \
+    --engine $params.massql_engine
     """
 }
 
@@ -99,7 +101,17 @@ process queryData {
     file "*_extract.json" optional true
 
     script:
-    def extractflag = params.extract == 'YES' ? "--extract_json ${mangled_output_filename}_extract.json" : ''
+    if (params.massql_engine == 'fast')
+    """
+    $TOOL_FOLDER/massql_rust \
+        "$input_spectrum" \
+        "${params.query}" \
+        --output-file "${mangled_output_filename}_output.tsv" \
+        --original-path "$filepath" \
+        --maxfilesize $params.maxfilesize \
+        ${ params.extract == 'YES' ? "--extract-json ${mangled_output_filename}_extract.json" : '' }
+    """
+    else
     """
     python $TOOL_FOLDER/msql_cmd.py \
         "$input_spectrum" \
@@ -108,7 +120,7 @@ process queryData {
         --original_path "$filepath" \
         --cache $params.cache \
         --cache_dir $params.massql_cache_directory \
-        $extractflag \
+        ${ params.extract == 'YES' ? "--extract_json ${mangled_output_filename}_extract.json" : '' } \
         --maxfilesize $params.maxfilesize
     """
 }
@@ -117,10 +129,10 @@ process queryData2 {
     errorStrategy 'ignore'
     maxForks 1
     time '4h'
-    
+
     //publishDir "$params.publishdir/nf_output/msql_temp", mode: 'copy'
     conda "$TOOL_FOLDER/conda_env.yml"
-    
+
     input:
     tuple val(filepath), val(mangled_output_filename), file(input_spectrum)
 
@@ -129,7 +141,17 @@ process queryData2 {
     file "*_extract.json" optional true
 
     script:
-    def extractflag = params.extract == 'YES' ? "--extract_json ${mangled_output_filename}_extract.json" : ''
+    if (params.massql_engine == 'fast')
+    """
+    $TOOL_FOLDER/massql_rust \
+        "$input_spectrum" \
+        "${params.query}" \
+        --output-file "${mangled_output_filename}_output.tsv" \
+        --original-path "$filepath" \
+        --maxfilesize $params.maxfilesize \
+        ${ params.extract == 'YES' ? "--extract-json ${mangled_output_filename}_extract.json" : '' }
+    """
+    else
     """
     python $TOOL_FOLDER/msql_cmd.py \
         "$input_spectrum" \
@@ -138,7 +160,7 @@ process queryData2 {
         --original_path "$filepath" \
         --cache $params.cache \
         --cache_dir $params.massql_cache_directory \
-        $extractflag \
+        ${ params.extract == 'YES' ? "--extract_json ${mangled_output_filename}_extract.json" : '' } \
         --maxfilesize $params.maxfilesize
     """
 }

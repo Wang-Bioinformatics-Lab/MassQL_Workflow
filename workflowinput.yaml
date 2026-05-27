@@ -1,7 +1,7 @@
 workflowname: massql_workflow
 workflowdescription: MassQL Nextflow Workflow
 workflowlongdescription: This is a MassQL Workflow
-workflowversion: "2025.10.30"
+workflowversion: "2026.05.26"
 workflowfile: nf_workflow.nf
 workflowautohide: false
 adminonly: false
@@ -41,6 +41,16 @@ parameterlist:
 
     - displayname: Query Options
       paramtype: section
+
+    - displayname: MassQL Engine
+      paramtype: select
+      nf_paramname: massql_engine
+      formvalue: "reference"
+      options:
+        - value: "reference"
+          display: "Reference (Python — full feature support)"
+        - value: "fast"
+          display: "Fast (Rust — ~100x, core queries)"
 
     - displayname: Analyze in Parallel
       paramtype: select
